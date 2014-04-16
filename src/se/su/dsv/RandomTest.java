@@ -9,12 +9,11 @@ import ca.pfv.spmf.algorithms.sequentialpatterns.spam.AlgoCMSPAM;
 public class RandomTest {
 
 	public static void main(String[] args) throws IOException {
-		List<Sequence> sequences = Sequence
-				.loadFromFile("data/sign.txt");
+		List<Sequence> sequences = Sequence.loadFromFile("data/contextPrefixSpan.txt");
 
 		Sequence.writeToFile(sequences, "data/tmp");
 		AlgoCMSPAM spam = new AlgoCMSPAM();
-		spam.runAlgorithm("data/tmp", "data/output", 0.8);
+		spam.runAlgorithm("data/tmp", "data/output", 0.2);
 		spam.printStatistics();
 
 		List<ResultSequence> result = Sequence
@@ -36,22 +35,24 @@ public class RandomTest {
 		Result r = Sequence.search(sequences, s);
 		System.out.println(r.getFrequency());
 
-		ResultSequence keepStatic = result.get(4);
-		ResultSequence toPValue = result.get(5);
+		ResultSequence keepStatic = result.get(7);
+		ResultSequence toPValue = result.get(8);
 		double losses = 0;
-		for (int n = 0; n < 1000; n++) {
+		for (int n = 0; n < 100; n++) {
 			List<Sequence> random = new LinkedList<Sequence>();
 			for (Sequence seq : sequences) {
-				random.add(seq.randomize(keepStatic));
+				random.add(seq.randomize());
 			}
 			Result res = Sequence.search(random, toPValue);
+			System.out.println(toPValue.getFrequency() + " "
+					+ res.getFrequency());
 			if (toPValue.getFrequency() <= res.getFrequency()) {
 				losses += 1;
 			}
 		}
 		System.out.println("Static sequence: " + keepStatic.prettyPrint());
 		System.out.println("Searching for: " + toPValue.prettyPrint());
-		System.out.println("p-value: " + losses / 1000);
+		System.out.println("p-value: " + losses / 100);
 
 	}
 }

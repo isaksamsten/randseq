@@ -96,7 +96,7 @@ public class Sequence {
 
 	// TODO: itemsets must be refactored to an ItemSet class which basically
 	// consists of a set
-	private ArrayList<String> itemsets = new ArrayList<String>();
+	private ArrayList<ItemSet> itemsets = new ArrayList<ItemSet>();
 
 	/**
 	 * Build a sequences (non-lazy) and not fault tolerant. That is, the
@@ -112,7 +112,7 @@ public class Sequence {
 				break;
 			} else if (token.equals("-1")) {
 				// EOF itemset
-				this.itemsets.add(itemset.toString());
+				this.itemsets.add(new ItemSet(itemset.toString()));
 				itemset = new StringBuilder();
 			} else {
 				itemset.append(token);
@@ -121,7 +121,7 @@ public class Sequence {
 		}
 	}
 
-	private Sequence(ArrayList<String> copy) {
+	private Sequence(ArrayList<ItemSet> copy) {
 		this.itemsets = copy;
 	}
 
@@ -138,7 +138,7 @@ public class Sequence {
 			return this;
 		}
 
-		ArrayList<String> replaced = new ArrayList<String>();
+		ArrayList<ItemSet> replaced = new ArrayList<ItemSet>();
 		for (int n = 0; n < itemsets.size(); n++) {
 			if (n == index) {
 				replaced.addAll(n, b.itemsets);
@@ -158,7 +158,7 @@ public class Sequence {
 	 */
 	public Sequence randomize() {
 		@SuppressWarnings("unchecked")
-		ArrayList<String> copy = (ArrayList<String>) itemsets.clone();
+		ArrayList<ItemSet> copy = (ArrayList<ItemSet>) itemsets.clone();
 		Collections.shuffle(copy);
 		return new Sequence(copy);
 	}
@@ -168,7 +168,7 @@ public class Sequence {
 		if (indexes == null) {
 			return randomize();
 		}
-		ArrayList<String> random = new ArrayList<String>();
+		ArrayList<ItemSet> random = new ArrayList<ItemSet>();
 		for (int n = 0; n < itemsets.size(); n++) {
 			if (!indexes.contains(n)) {
 				random.add(itemsets.get(n));
@@ -187,7 +187,7 @@ public class Sequence {
 			return this;
 		}
 		int otherIndex = 0;
-		ArrayList<String> replaced = new ArrayList<String>();
+		ArrayList<ItemSet> replaced = new ArrayList<ItemSet>();
 		for (int n = 0; n < itemsets.size(); n++) {
 			if (indexes.contains(n)) {
 				replaced.add(b.itemsets.get(otherIndex));
@@ -235,7 +235,7 @@ public class Sequence {
 				int j = ((i % 2) == 0) ? 0 : p[i];
 				Collections.swap(a, i, j);
 				randomSequences
-						.add(new Sequence((ArrayList<String>) a.clone()));
+						.add(new Sequence((ArrayList<ItemSet>) a.clone()));
 				p[i]++;
 				i = 1;
 			} else {
@@ -253,7 +253,7 @@ public class Sequence {
 			return randomize();
 		int lastIndex = firstIndex + keepStatic.length();
 
-		ArrayList<String> randomItemsets = new ArrayList<String>();
+		ArrayList<ItemSet> randomItemsets = new ArrayList<ItemSet>();
 		for (int n = 0; n < itemsets.size(); n++) {
 			if (n >= firstIndex && n < lastIndex)
 				continue;
@@ -271,7 +271,7 @@ public class Sequence {
 			return null;
 		}
 
-		ArrayList<String> subSequence = new ArrayList<String>();
+		ArrayList<ItemSet> subSequence = new ArrayList<ItemSet>();
 		for (int n = 0; n < itemsets.size(); n++) {
 			if (n >= start && n < end) {
 				subSequence.add(itemsets.get(n));
@@ -311,7 +311,7 @@ public class Sequence {
 		int indexOf = -1;
 		int otherLength = other.length();
 		for (int n = 0; n < itemsets.size(); n++) {
-			if (itemsets.get(n).equals(other.itemsets.get(otherIndex))) {
+			if (itemsets.get(n).contains(other.itemsets.get(otherIndex))) {
 				otherIndex += 1;
 				if (indexOf == -1)
 					indexOf = n;
@@ -369,7 +369,7 @@ public class Sequence {
 		return indexOfConsecutive(other) != -1;
 	}
 
-	public String itemset(int index) {
+	public ItemSet itemset(int index) {
 		return itemsets.get(index);
 	}
 
@@ -380,7 +380,7 @@ public class Sequence {
 	@Override
 	public String toString() {
 		StringBuilder sequence = new StringBuilder();
-		for (String item : itemsets) {
+		for (ItemSet item : itemsets) {
 			sequence.append(item);
 			sequence.append("-1 ");
 		}
@@ -390,7 +390,7 @@ public class Sequence {
 
 	public String prettyPrint() {
 		StringBuilder sequence = new StringBuilder();
-		for (String item : itemsets) {
+		for (ItemSet item : itemsets) {
 			sequence.append(item);
 			sequence.append(", ");
 		}
