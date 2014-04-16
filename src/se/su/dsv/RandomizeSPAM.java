@@ -13,6 +13,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 
 import ca.pfv.spmf.algorithms.sequentialpatterns.spam.AlgoCMSPAM;
 import ca.pfv.spmf.algorithms.sequentialpatterns.spam.AlgoSPAM;
@@ -57,7 +59,7 @@ public class RandomizeSPAM {
 		}
 
 		System.out.println(" ==== Sorted by Frequency ==== ");
-		for (Map.Entry<String, Integer> kv : sorted(baseline, false)) {
+		for (Map.Entry<String, Integer> kv : SetUtils.sortMapByValue(baseline, false)) {
 			String sequence = kv.getKey();
 			double sup = kv.getValue() / ((float) totalNoSequences);
 			double pvalue = 0;
@@ -70,7 +72,7 @@ public class RandomizeSPAM {
 		}
 
 		System.out.println("\n ==== Sorted by p-value ==== ");
-		for (Map.Entry<String, Integer> kv : sorted(wins, true)) {
+		for (Map.Entry<String, Integer> kv : SetUtils.sortMapByValue(wins, true)) {
 			String sequence = kv.getKey();
 			int noWins = kv.getValue();
 			double pvalue = (noWins + 1) / ((float) NO_TRIALS + 1);
@@ -81,24 +83,6 @@ public class RandomizeSPAM {
 			}
 		}
 
-	}
-
-	public static <K, V extends Comparable<? super V>> ArrayList<Map.Entry<K, V>> sorted(
-			Map<K, V> map, final boolean asc) {
-		ArrayList<Map.Entry<K, V>> sorted = new ArrayList<Map.Entry<K, V>>(
-				map.entrySet());
-		Collections.sort(sorted, new Comparator<Map.Entry<K, V>>() {
-
-			@Override
-			public int compare(Entry<K, V> o1, Entry<K, V> o2) {
-				if (asc) {
-					return o2.getValue().compareTo(o1.getValue());
-				} else {
-					return o1.getValue().compareTo(o2.getValue());
-				}
-			}
-		});
-		return sorted;
 	}
 
 	public static int countLines(String filename) throws IOException {
