@@ -16,7 +16,7 @@ public class RandomTest {
 	 */
 	public static void main(String[] args) throws IOException {
 		List<Sequence> sequences = Sequence
-				.loadFromFile("data/contextPrefixSpan.txt");
+				.loadFromFile("data/lev.txt");
 		Sequence.writeToFile(sequences, "data/tmp");
 
 		ca.pfv.spmf.algorithms.sequentialpatterns.clasp_AGP.dataStructures.creators.AbstractionCreator abstractionCreator = ca.pfv.spmf.algorithms.sequentialpatterns.clasp_AGP.dataStructures.creators.AbstractionCreator_Qualitative
@@ -26,7 +26,7 @@ public class RandomTest {
 		ca.pfv.spmf.algorithms.sequentialpatterns.clasp_AGP.dataStructures.database.SequenceDatabase sd = new ca.pfv.spmf.algorithms.sequentialpatterns.clasp_AGP.dataStructures.database.SequenceDatabase(
 				abstractionCreator, idListCreator);
 
-		double relativeMinSup = sd.loadFile("data/tmp", 0.5);
+		double relativeMinSup = sd.loadFile("data/tmp", 0.3);
 
 		AlgoCM_ClaSP spam = new AlgoCM_ClaSP(relativeMinSup,
 				abstractionCreator, true, true);

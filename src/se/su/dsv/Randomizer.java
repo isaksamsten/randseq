@@ -143,14 +143,14 @@ public class Randomizer {
 				idListCreator);
 
 		try {
-			Sequence.writeToFile(sequences, "data/tmp");
-			double relativeMinSup = sd.loadFile("data/tmp", minSup);
+			Sequence.writeToFile(sequences, "/tmp/randomizer");
+			double relativeMinSup = sd.loadFile("/tmp/randomizer", minSup);
 			AlgoCM_ClaSP spam = new AlgoCM_ClaSP(relativeMinSup,
 					abstractionCreator, true, true);
-			spam.runAlgorithm(sd, true, false, "data/output");
+			spam.runAlgorithm(sd, true, false, "/tmp/randomizer_output");
 			spam.printStatistics();
 
-			resultSequences = Sequence.loadFromResultFile("data/output");
+			resultSequences = Sequence.loadFromResultFile("/tmp/randomizer_output");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -171,11 +171,12 @@ public class Randomizer {
 			}
 		}
 
+		out("Id\tSequence");
 		for (Sequence s : sequences) {
 			if (currentSequence++ > maxSequences) {
 				break;
 			}
-			out(currentSequence - 1 + ":\t" + s.prettyPrint());
+			out(currentSequence - 1 + "\t" + s.prettyPrint());
 		}
 	}
 
