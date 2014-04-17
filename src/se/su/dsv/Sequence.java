@@ -19,7 +19,8 @@ import java.util.TreeSet;
 
 public class Sequence {
 
-	public static List<Sequence> loadFromFile(String inputFile) {
+	public static List<Sequence> loadFromFile(String inputFile)
+			throws IOException {
 		List<Sequence> sequences = new LinkedList<Sequence>();
 		BufferedReader reader = null;
 		try {
@@ -30,14 +31,13 @@ public class Sequence {
 				sequences.add(new Sequence(line));
 			}
 		} catch (Exception e) {
-
+			throw e;
 		} finally {
 			if (reader != null)
 				try {
 					reader.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw e;
 				}
 		}
 

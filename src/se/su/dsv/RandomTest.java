@@ -4,55 +4,86 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import ca.pfv.spmf.algorithms.sequentialpatterns.clasp_AGP.AlgoCM_ClaSP;
+import ca.pfv.spmf.algorithms.sequentialpatterns.clasp_AGP.dataStructures.database.SequenceDatabase;
 import ca.pfv.spmf.algorithms.sequentialpatterns.spam.AlgoCMSPAM;
 
 public class RandomTest {
-
+	/*
+	 * for (ResultSequence s : result) { System.out.println(index + ": " +
+	 * s.prettyPrint() + " => " + (s.getFrequency() ==
+	 * Sequence.search(sequences, s) .getFrequency())); index += 1; }
+	 */
 	public static void main(String[] args) throws IOException {
-		List<Sequence> sequences = Sequence.loadFromFile("data/contextPrefixSpan.txt");
-
+		List<Sequence> sequences = Sequence
+				.loadFromFile("data/contextPrefixSpan.txt");
 		Sequence.writeToFile(sequences, "data/tmp");
-		AlgoCMSPAM spam = new AlgoCMSPAM();
-		spam.runAlgorithm("data/tmp", "data/output", 0.2);
+
+		ca.pfv.spmf.algorithms.sequentialpatterns.clasp_AGP.dataStructures.creators.AbstractionCreator abstractionCreator = ca.pfv.spmf.algorithms.sequentialpatterns.clasp_AGP.dataStructures.creators.AbstractionCreator_Qualitative
+				.getInstance();
+		ca.pfv.spmf.algorithms.sequentialpatterns.clasp_AGP.idlists.creators.IdListCreator idListCreator = ca.pfv.spmf.algorithms.sequentialpatterns.clasp_AGP.idlists.creators.IdListCreatorStandard_Map
+				.getInstance();
+		ca.pfv.spmf.algorithms.sequentialpatterns.clasp_AGP.dataStructures.database.SequenceDatabase sd = new ca.pfv.spmf.algorithms.sequentialpatterns.clasp_AGP.dataStructures.database.SequenceDatabase(
+				abstractionCreator, idListCreator);
+
+		double relativeMinSup = sd.loadFile("data/tmp", 0.5);
+
+		AlgoCM_ClaSP spam = new AlgoCM_ClaSP(relativeMinSup,
+				abstractionCreator, true, true);
+		spam.runAlgorithm(sd, true, false, "data/output");
+		// spam.runAlgorithm("data/tmp", "data/output", 0.4);
 		spam.printStatistics();
 
 		List<ResultSequence> result = Sequence
 				.loadFromResultFile("data/output");
 		int index = 0;
+
 		for (ResultSequence s : result) {
 			System.out.println(index
 					+ ": "
 					+ s.prettyPrint()
 					+ " => "
-					+ (s.getFrequency() == +Sequence.search(sequences, s)
+					+ (s.getFrequency() == Sequence.search(sequences, s)
 							.getFrequency()));
 			index += 1;
 		}
-		ResultSequence s = result.get(3);
+
+		ResultSequence keepStatic = result.get(8);
+		ResultSequence toPValue = result.get(5);
 		System.out.println("===========");
-		System.out.println(s.prettyPrint() + " " + s.getFrequency());
-		System.out.println("===========");
-		Result r = Sequence.search(sequences, s);
+		System.out.print(toPValue.prettyPrint() + " " + toPValue.getFrequency()
+				+ " == ");
+		Result r = Sequence.search(sequences, toPValue);
 		System.out.println(r.getFrequency());
 
-		ResultSequence keepStatic = result.get(7);
-		ResultSequence toPValue = result.get(8);
-		double losses = 0;
-		for (int n = 0; n < 100; n++) {
+		System.out.println("===========");
+
+		double losses = 0, total = 100;
+		for (int n = 0; n < total; n++) {
 			List<Sequence> random = new LinkedList<Sequence>();
 			for (Sequence seq : sequences) {
-				random.add(seq.randomize());
+				random.add(seq.randomize(keepStatic));
 			}
 			Result res = Sequence.search(random, toPValue);
-			System.out.println(toPValue.getFrequency() + " "
-					+ res.getFrequency());
 			if (toPValue.getFrequency() <= res.getFrequency()) {
 				losses += 1;
 			}
 		}
 		System.out.println("Static sequence: " + keepStatic.prettyPrint());
 		System.out.println("Searching for: " + toPValue.prettyPrint());
-		System.out.println("p-value: " + losses / 100);
+		System.out.println("p-value: " + losses / total);
+
+		losses = 0;
+		List<Sequence> permutations = toPValue.randomizeConsecutive(1000);
+		for (Sequence perm : permutations) {
+			Result res = Sequence.search(sequences, perm);
+			if (toPValue.getFrequency() <= res.getFrequency()) {
+				losses += 1;
+			}
+		}
+		System.out.println("Permuted sequence: " + toPValue.prettyPrint());
+		System.out.format("p-value: %.2f (%.2f/%d)\n",
+				losses / permutations.size(), losses, permutations.size());
 
 	}
 }
