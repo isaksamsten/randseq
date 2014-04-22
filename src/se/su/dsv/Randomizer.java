@@ -12,6 +12,7 @@ import ca.pfv.spmf.algorithms.sequentialpatterns.clasp_AGP.dataStructures.creato
 import ca.pfv.spmf.algorithms.sequentialpatterns.clasp_AGP.dataStructures.database.SequenceDatabase;
 import ca.pfv.spmf.algorithms.sequentialpatterns.clasp_AGP.idlists.creators.IdListCreator;
 import ca.pfv.spmf.algorithms.sequentialpatterns.clasp_AGP.idlists.creators.IdListCreatorStandard_Map;
+import ca.pfv.spmf.algorithms.sequentialpatterns.spam.AlgoCMSPAM;
 
 public class Randomizer {
 
@@ -19,13 +20,16 @@ public class Randomizer {
 	private static List<ResultSequence> resultSequences = null;
 
 	public static void main(String[] args) {
+		if (args.length > 0) {
+			// interpret commands from file..
+		}
 		Scanner sc = new Scanner(System.in);
 		String line = null;
 		System.out.print(">> ");
 		load(new String[] { "data/contextPrefixSpan.txt" });
-		run(new String[] { "dsadsa", "0.5" });
+		run(new String[] { "spam", "0.5" });
 		while (!(line = sc.nextLine()).equals("exit")) {
-			String[] cmd = line.split("\\s+");
+			String[] cmd = line.trim().split("\\s+");
 			processCommand(cmd);
 
 			System.out.print(">> ");
@@ -136,21 +140,30 @@ public class Randomizer {
 			out("invalid minsup");
 			return;
 		}
-		AbstractionCreator abstractionCreator = AbstractionCreator_Qualitative
-				.getInstance();
-		IdListCreator idListCreator = IdListCreatorStandard_Map.getInstance();
-		SequenceDatabase sd = new SequenceDatabase(abstractionCreator,
-				idListCreator);
-
 		try {
 			Sequence.writeToFile(sequences, "/tmp/randomizer");
-			double relativeMinSup = sd.loadFile("/tmp/randomizer", minSup);
-			AlgoCM_ClaSP spam = new AlgoCM_ClaSP(relativeMinSup,
-					abstractionCreator, true, true);
-			spam.runAlgorithm(sd, true, false, "/tmp/randomizer_output");
-			spam.printStatistics();
+			if (args[0].equalsIgnoreCase("clasp")) {
+				AbstractionCreator abstractionCreator = AbstractionCreator_Qualitative
+						.getInstance();
+				IdListCreator idListCreator = IdListCreatorStandard_Map
+						.getInstance();
+				SequenceDatabase sd = new SequenceDatabase(abstractionCreator,
+						idListCreator);
+				double relativeMinSup = sd.loadFile("/tmp/randomizer", minSup);
+				AlgoCM_ClaSP spam = new AlgoCM_ClaSP(relativeMinSup,
+						abstractionCreator, true, true);
+				spam.runAlgorithm(sd, true, false, "/tmp/randomizer_output");
+				spam.printStatistics();
+			} else if (args[0].equalsIgnoreCase("spam")) {
+				AlgoCMSPAM spam = new AlgoCMSPAM();
+				spam.runAlgorithm("/tmp/randomizer", "/tmp/randomizer_output",
+						minSup);
+			} else {
+				out("'run' unkown algorithm: " + args[0]);
+			}
 
-			resultSequences = Sequence.loadFromResultFile("/tmp/randomizer_output");
+			resultSequences = Sequence
+					.loadFromResultFile("/tmp/randomizer_output");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

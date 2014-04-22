@@ -8,9 +8,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -164,17 +166,44 @@ public class Sequence {
 	}
 
 	public Sequence randomize(Sequence keepStatic) {
-		Set<Integer> indexes = indexes(keepStatic);
+		TreeSet<Integer> indexes = indexes(keepStatic);
 		if (indexes == null) {
 			return randomize();
 		}
+		int size = itemsets.size();
 		ArrayList<ItemSet> random = new ArrayList<ItemSet>();
-		for (int n = 0; n < itemsets.size(); n++) {
+		ArrayList<Boolean> list = new ArrayList<Boolean>();
+		int noTrue = indexes.size();
+		for (int n = 0; n < size; n++) {
 			if (!indexes.contains(n)) {
 				random.add(itemsets.get(n));
 			}
+			if (n < noTrue)
+				list.add(true);
+			else
+				list.add(false);
 		}
 		Collections.shuffle(random);
+		Collections.shuffle(list);
+		// System.out.println(list);
+
+		// TODO: this is fairly ugly. rewrite
+		// Iterator<Integer> iter = indexes.iterator();
+		// for (int n = 0; n < list.size(); n++) {
+		// if (list.get(n)) {
+		// if (iter.hasNext()) {
+		// Integer i = iter.next();
+		// int pos = n;
+		// if (pos > random.size() - 1) {
+		// random.add(itemsets.get(i));
+		// } else {
+		// random.add(pos, itemsets.get(i));
+		// }
+		// } else {
+		// break;
+		// }
+		// }
+		// }
 		for (Integer i : indexes) {
 			random.add(i, itemsets.get(i));
 		}
@@ -201,6 +230,12 @@ public class Sequence {
 
 	public List<Sequence> randomizeConsecutive(int maxPerm) {
 		int n = length();
+		/*
+		 * Using Stirling's approximation [0] to approximate the number of
+		 * permutations as: n! ~ sqrt(2pi*n)(n/e)^n
+		 * 
+		 * [0] - http://en.wikipedia.org/wiki/Stirling's_approximation
+		 */
 		long approximateFactorial = Math.round(Math.sqrt(2 * Math.PI * n)
 				* Math.pow(n / Math.E, n));
 		if (approximateFactorial < maxPerm) {
@@ -335,8 +370,8 @@ public class Sequence {
 	 * @param other
 	 * @return
 	 */
-	public Set<Integer> indexes(Sequence other) {
-		Set<Integer> indexes = new TreeSet<Integer>();
+	public TreeSet<Integer> indexes(Sequence other) {
+		TreeSet<Integer> indexes = new TreeSet<Integer>();
 		int otherIndex = 0, otherLength = other.length();
 		for (int n = 0; n < itemsets.size(); n++) {
 			if (itemsets.get(n).contains(other.itemsets.get(otherIndex))) {

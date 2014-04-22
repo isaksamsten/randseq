@@ -1,19 +1,27 @@
 package se.su.dsv;
 
+import java.io.IOException;
 import java.util.List;
 
 public class SequenceTest {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
-		System.out.println("1".contains("1"));
-		Sequence s1 = new Sequence("2 3 -1 1 -1 2 3 -1 3 -1 5 -1");
+		Sequence s1 = new Sequence("1 -1 2 3 -1 2 3 -1 3 -1 5 -1");
 		Sequence sub = new Sequence("1 -1 2 3 -1 -2").randomize();
 		Sequence sub2 = new Sequence("3 -1 5 -1 -2");
 		Sequence sub3 = new Sequence("99 -1 88 -1 -2");
 
+		List<Sequence> ss = Sequence.loadFromFile("data/contextPrefixSpan.txt");
+		Sequence c = sub2;
+		Sequence a = ss.get(1);
+		Sequence b = ss.get(2);
+
+		System.out.println(a.prettyPrint());
+		System.out.println(b.prettyPrint());
+		System.out.println(a.randomize(c).prettyPrint());
+
 		List<Sequence> lst = sub2.randomizeConsecutive(1000000);
-		System.out.println(lst.size());
 		System.out.println("== " + lst.size() + " permutations + original ==");
 		System.out.println(sub2.prettyPrint());
 		for (Sequence s : lst) {
