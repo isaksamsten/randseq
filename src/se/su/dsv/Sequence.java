@@ -188,25 +188,25 @@ public class Sequence {
 		// System.out.println(list);
 
 		// TODO: this is fairly ugly. rewrite
-		// Iterator<Integer> iter = indexes.iterator();
-		// for (int n = 0; n < list.size(); n++) {
-		// if (list.get(n)) {
-		// if (iter.hasNext()) {
-		// Integer i = iter.next();
-		// int pos = n;
-		// if (pos > random.size() - 1) {
-		// random.add(itemsets.get(i));
-		// } else {
-		// random.add(pos, itemsets.get(i));
-		// }
-		// } else {
-		// break;
-		// }
-		// }
-		// }
-		for (Integer i : indexes) {
-			random.add(i, itemsets.get(i));
+		Iterator<Integer> iter = indexes.iterator();
+		for (int n = 0; n < list.size(); n++) {
+			if (list.get(n)) {
+				if (iter.hasNext()) {
+					Integer i = iter.next();
+					int pos = n;
+					if (pos > random.size() - 1) {
+						random.add(itemsets.get(i));
+					} else {
+						random.add(pos, itemsets.get(i));
+					}
+				} else {
+					break;
+				}
+			}
 		}
+//		for (Integer i : indexes) {
+//			random.add(i, itemsets.get(i));
+//		}
 		return new Sequence(random);
 	}
 
