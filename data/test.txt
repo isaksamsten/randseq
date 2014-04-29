@@ -1,0 +1,2 @@
+load data/contextPrefixSpan.txt
+run spam 0.5

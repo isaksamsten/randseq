@@ -95,9 +95,6 @@ public class Sequence {
 	}
 
 	private static Random RANDOM = new Random();
-
-	// TODO: itemsets must be refactored to an ItemSet class which basically
-	// consists of a set
 	private ArrayList<ItemSet> itemsets = new ArrayList<ItemSet>();
 
 	/**
@@ -167,46 +164,43 @@ public class Sequence {
 
 	public Sequence randomize(Sequence keepStatic) {
 		TreeSet<Integer> indexes = indexes(keepStatic);
-		if (indexes == null) {
-			return randomize();
+		if (indexes == null) { // if keepStatic ain't a subsequence
+			return randomize(); // just permute..
 		}
-		int size = itemsets.size();
 		ArrayList<ItemSet> random = new ArrayList<ItemSet>();
-		ArrayList<Boolean> list = new ArrayList<Boolean>();
-		int noTrue = indexes.size();
-		for (int n = 0; n < size; n++) {
+		ArrayList<Boolean> order = new ArrayList<Boolean>();
+		for (int n = 0; n < itemsets.size(); n++) {
 			if (!indexes.contains(n)) {
 				random.add(itemsets.get(n));
 			}
-			if (n < noTrue)
-				list.add(true);
-			else
-				list.add(false);
+			if (n < indexes.size()) {
+				order.add(true);
+			} else {
+				order.add(false);
+			}
 		}
 		Collections.shuffle(random);
-		Collections.shuffle(list);
-		// System.out.println(list);
+		Collections.shuffle(order);
 
 		// TODO: this is fairly ugly. rewrite
-		Iterator<Integer> iter = indexes.iterator();
-		for (int n = 0; n < list.size(); n++) {
-			if (list.get(n)) {
-				if (iter.hasNext()) {
-					Integer i = iter.next();
-					int pos = n;
-					if (pos > random.size() - 1) {
+		Iterator<Integer> index = indexes.iterator();
+		for (int n = 0; n < order.size(); n++) {
+			if (order.get(n)) {
+				if (index.hasNext()) {
+					Integer i = index.next();
+					if (n > random.size() - 1) { // put it last
 						random.add(itemsets.get(i));
 					} else {
-						random.add(pos, itemsets.get(i));
+						random.add(n, itemsets.get(i));
 					}
 				} else {
 					break;
 				}
 			}
 		}
-//		for (Integer i : indexes) {
-//			random.add(i, itemsets.get(i));
-//		}
+		// for (Integer i : indexes) {
+		// random.add(i, itemsets.get(i));
+		// }
 		return new Sequence(random);
 	}
 
