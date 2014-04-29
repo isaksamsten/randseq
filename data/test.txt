@@ -1,2 +1,2 @@
-load data/contextPrefixSpan.txt
+load contextPrefixSpan.txt
 run spam 0.5

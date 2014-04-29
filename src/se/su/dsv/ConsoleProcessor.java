@@ -43,4 +43,19 @@ public class ConsoleProcessor implements Processor {
 		}
 	}
 
+	@Override
+	public void print(String out) {
+		try {
+			sc.print(out);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public String getWorkingDir() {
+		return ".";
+	}
+
 }

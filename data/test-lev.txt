@@ -1,0 +1,5 @@
+load lev.txt
+run spam 0.3
+permute 10
+pvalue 10 100
+pvalue 10 100 13

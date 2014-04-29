@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,7 +27,8 @@ public class Randomizer {
 	private static int lineNo = 1;
 
 	public static void main(String[] args) throws Exception {
-		ConsoleProcessor sc = new ConsoleProcessor("");
+		Processor sc = !TerminalFactory.get().isSupported() ? new ConsoleProcessor(
+				"") : new StandardProcessor();
 		if (args.length > 0) {
 			eval(sc, args);
 		}
@@ -48,7 +50,7 @@ public class Randomizer {
 		return true;
 	}
 
-	private static void stdin(ConsoleProcessor sc) {
+	private static void stdin(Processor sc) {
 		process(sc);
 	}
 
@@ -94,6 +96,8 @@ public class Randomizer {
 			return pvalue(sc, args);
 		} else if (name.equalsIgnoreCase("pvalue_all")) {
 			return pvalueAll(sc, args);
+		} else if (name.equalsIgnoreCase("permute")) {
+			return permute(sc, args);
 		} else if (name.equalsIgnoreCase("eval")) {
 			return eval(sc, args);
 		} else if (name.equalsIgnoreCase("exit")) {
@@ -104,6 +108,32 @@ public class Randomizer {
 			return false;
 		}
 
+	}
+
+	private static boolean permute(Processor sc, String[] args) {
+		if (args.length != 1) {
+			sc.println("need sequence to permute");
+			return false;
+		}
+		int id = Integer.parseInt(args[0]);
+		if (id > resultSequences.size() - 1 || id < 0) {
+			out(sc, "'permute' out of bounds");
+			return false;
+		}
+		ResultSequence pivot = resultSequences.get(id);
+		List<Sequence> permutations = pivot.permute(100);
+		List<String> labels = new ArrayList<String>();
+		labels.add(pivot.prettyPrint());
+		List<Double> values = new ArrayList<Double>();
+		values.add(pivot.getFrequency());
+		for (Sequence s : permutations) {
+			Result res = Sequence.search(sequences, s);
+			labels.add(s.prettyPrint());
+			values.add(res.getFrequency());
+		}
+		Plot p = new BoxPlot(sc, 100);
+		p.plot(labels, values);
+		return true;
 	}
 
 	private static boolean pvalueAll(Processor sc, String[] args) {
@@ -148,7 +178,7 @@ public class Randomizer {
 					losses += 1;
 				}
 			}
-			out(sc, "pvalue is " + losses / iter);
+			out(sc, toPValue.prettyPrint() + " : " + losses / iter);
 		} else if (args.length == 3) { // with static
 			int id = Integer.parseInt(args[0]), iter = Integer
 					.parseInt(args[1]), staticId = Integer.parseInt(args[2]);
@@ -174,7 +204,7 @@ public class Randomizer {
 					losses += 1;
 				}
 			}
-			out(sc, "pvalue is " + losses / iter);
+			out(sc, toPValue.prettyPrint() + " : " + losses / iter);
 		} else {
 			out(sc, "'pvalue' expects at least two argument");
 			return false;
@@ -185,7 +215,7 @@ public class Randomizer {
 
 	private static boolean frequent(Processor sc, String[] args) {
 		if (resultSequences == null) {
-			out(sc, "'frequent' expects an algorithm to have ran");
+			out(sc, "'frequent' expects an algorithm to have run");
 			return false;
 		}
 		out(sc, "Id\tFreq.\tSequence");
@@ -272,7 +302,8 @@ public class Randomizer {
 			return false;
 		}
 		try {
-			sequences = Sequence.loadFromFile(args[0]);
+			sequences = Sequence.loadFromFile(new File(sc.getWorkingDir(),
+					args[0]));
 		} catch (IOException e) {
 			out(sc, e.getMessage());
 			return false;

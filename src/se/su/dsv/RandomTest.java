@@ -1,5 +1,6 @@
 package se.su.dsv;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,8 +16,8 @@ public class RandomTest {
 	 * Sequence.search(sequences, s) .getFrequency())); index += 1; }
 	 */
 	public static void main(String[] args) throws IOException {
-		List<Sequence> sequences = Sequence
-				.loadFromFile("data/lev.txt");
+		List<Sequence> sequences = Sequence.loadFromFile(new File(
+				"data/lev.txt"));
 		Sequence.writeToFile(sequences, "data/tmp");
 
 		ca.pfv.spmf.algorithms.sequentialpatterns.clasp_AGP.dataStructures.creators.AbstractionCreator abstractionCreator = ca.pfv.spmf.algorithms.sequentialpatterns.clasp_AGP.dataStructures.creators.AbstractionCreator_Qualitative
@@ -74,7 +75,7 @@ public class RandomTest {
 		System.out.println("p-value: " + losses / total);
 
 		losses = 0;
-		List<Sequence> permutations = toPValue.randomizeConsecutive(1000);
+		List<Sequence> permutations = toPValue.permute(1000);
 		for (Sequence perm : permutations) {
 			Result res = Sequence.search(sequences, perm);
 			if (toPValue.getFrequency() <= res.getFrequency()) {

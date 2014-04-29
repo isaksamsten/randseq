@@ -10,4 +10,9 @@ public interface Processor {
 
 	void println(String out);
 
+	void print(String out);
+	
+
+	String getWorkingDir();
+
 }

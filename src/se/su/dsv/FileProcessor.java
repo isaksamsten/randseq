@@ -8,9 +8,11 @@ import java.util.Scanner;
 public class FileProcessor implements Processor {
 
 	private Scanner sc;
+	private File file;
 
 	public FileProcessor(File file) throws FileNotFoundException {
 		this.sc = new Scanner(file);
+		this.file = file;
 	}
 
 	@Override
@@ -30,4 +32,13 @@ public class FileProcessor implements Processor {
 		System.out.println(out);
 	}
 
+	@Override
+	public void print(String out) {
+		System.out.print(out);
+	}
+
+	@Override
+	public String getWorkingDir() {
+		return file.getParent();
+	}
 }

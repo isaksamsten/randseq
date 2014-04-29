@@ -1,18 +1,25 @@
 package se.su.dsv;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 public class SequenceTest {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
+
+		Plot p = new BoxPlot(new StandardProcessor(), 100);
+		p.plot(Arrays.asList(new String[] { "hej", "isak", "test" }),
+				Arrays.asList(new Double[] { 25., 25.0, 50.0 }));
 
 		Sequence s1 = new Sequence("1 -1 2 3 -1 2 3 -1 3 -1 5 -1");
 		Sequence sub = new Sequence("1 -1 2 3 -1 -2").randomize();
 		Sequence sub2 = new Sequence("3 -1 5 -1 -2");
 		Sequence sub3 = new Sequence("99 -1 88 -1 -2");
 
-		List<Sequence> ss = Sequence.loadFromFile("data/contextPrefixSpan.txt");
+		List<Sequence> ss = Sequence.loadFromFile(new File(
+				"data/contextPrefixSpan.txt"));
 		Sequence c = sub2;
 		Sequence a = ss.get(1);
 		Sequence b = ss.get(2);
@@ -21,7 +28,7 @@ public class SequenceTest {
 		System.out.println(b.prettyPrint());
 		System.out.println(a.randomize(c).prettyPrint());
 
-		List<Sequence> lst = sub2.randomizeConsecutive(1000000);
+		List<Sequence> lst = sub2.permute(1000000);
 		System.out.println("== " + lst.size() + " permutations + original ==");
 		System.out.println(sub2.prettyPrint());
 		for (Sequence s : lst) {

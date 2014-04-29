@@ -21,12 +21,12 @@ import java.util.TreeSet;
 
 public class Sequence {
 
-	public static List<Sequence> loadFromFile(String inputFile)
+	public static List<Sequence> loadFromFile(File inputFile)
 			throws IOException {
 		List<Sequence> sequences = new LinkedList<Sequence>();
 		BufferedReader reader = null;
 		try {
-			FileInputStream fin = new FileInputStream(new File(inputFile));
+			FileInputStream fin = new FileInputStream(inputFile);
 			reader = new BufferedReader(new InputStreamReader(fin));
 			String line = null;
 			while ((line = reader.readLine()) != null) {
@@ -222,7 +222,14 @@ public class Sequence {
 		return new Sequence(replaced);
 	}
 
-	public List<Sequence> randomizeConsecutive(int maxPerm) {
+	/**
+	 * Permute the sequence
+	 * 
+	 * @param maxPerm
+	 *            - maximum number of permutations to return
+	 * @return
+	 */
+	public List<Sequence> permute(int maxPerm) {
 		int n = length();
 		/*
 		 * Using Stirling's approximation [0] to approximate the number of
@@ -247,7 +254,7 @@ public class Sequence {
 	 * Returns the permutations of the sequence. Although a quite efficent
 	 * implementation using the QuickPerm algorithm is used, it's not
 	 * recommended for sequences longer than perhaps 8 itemsets (8! = 40320
-	 * permutations). Instead use, randomize(int) which gives at maximum n
+	 * permutations). Instead use, permute(int) which gives at maximum n
 	 * "permutations".
 	 * 
 	 * @return
