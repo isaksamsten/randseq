@@ -18,7 +18,7 @@ public class ConsoleProcessor implements Processor {
 		this.sc = new ConsoleReader();
 		this.sc.addCompleter(new StringsCompleter(Arrays.asList(new String[] {
 				"run", "frequent", "pvalue", "pvalue_all", "exit", "eval",
-				"help", "ls" })));
+				"permute", "help", "list" })));
 		this.sc.setPrompt("In  : ");
 	}
 

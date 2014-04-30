@@ -1,5 +1,24 @@
-load lev.txt
-run spam 0.3
-permute 10
-pvalue 10 100
-pvalue 10 100 13
+echo ******** loading lev.txt *******
+!load lev.txt
+!run spam 0.3
+
+echo ******* permute sequence *******
+!permute 10
+
+echo ******* calculate pvalue of same sequence *******
+!pvalue 10 100
+
+echo ******* calculate pvalue while keeping a part static *******
+!pvalue 10 100 13
+
+echo
+echo
+
+echo ******** loading sign database ********
+!load sign.txt
+!run spam 0.5
+
+echo ******* permuting sequences ********
+!permute 114
+!permute 169
+!exit

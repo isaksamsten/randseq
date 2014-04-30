@@ -18,7 +18,10 @@ public class FileProcessor implements Processor {
 	@Override
 	public String nextLine() throws IOException {
 		String next = sc.nextLine();
-		System.out.println("Eval: " + next);
+		if (next.trim().startsWith("!")) {
+			System.out.println(next);
+			next = next.trim().substring(1);
+		}
 		return next;
 	}
 

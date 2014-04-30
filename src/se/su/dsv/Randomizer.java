@@ -27,7 +27,7 @@ public class Randomizer {
 	private static int lineNo = 1;
 
 	public static void main(String[] args) throws Exception {
-		Processor sc = !TerminalFactory.get().isSupported() ? new ConsoleProcessor(
+		Processor sc = TerminalFactory.get().isSupported() ? new ConsoleProcessor(
 				"") : new StandardProcessor();
 		if (args.length > 0) {
 			eval(sc, args);
@@ -62,6 +62,8 @@ public class Randomizer {
 		String line = null;
 		try {
 			while (sc.hasNextLine() && (line = sc.nextLine()) != null) {
+				if (line.trim().startsWith("#"))
+					continue;
 				String[] cmd = line.trim().split("\\s+");
 				if (!processCommand(sc, cmd) && eval)
 					return false;
@@ -76,8 +78,7 @@ public class Randomizer {
 
 	private static boolean processCommand(Processor sc, String[] cmd) {
 		if (cmd.length == 0) {
-			out(sc, "invalid command");
-			return false;
+			return true;
 		}
 		String name = cmd[0];
 		String[] args = Arrays.copyOfRange(cmd, 1, cmd.length);
@@ -86,8 +87,17 @@ public class Randomizer {
 			return true;
 		} else if (name.equalsIgnoreCase("load")) {
 			return load(sc, args);
-		} else if (name.equalsIgnoreCase("ls")) {
-			return ls(sc, args);
+		} else if (name.equalsIgnoreCase("list")) {
+			return list(sc, args);
+		} else if (name.equalsIgnoreCase("echo")) {
+			if (args.length > 0) {
+				for (String p : args)
+					sc.print(p + " ");
+				sc.println("");
+			} else {
+				sc.println("");
+			}
+			return true;
 		} else if (name.equalsIgnoreCase("run")) {
 			return run(sc, args);
 		} else if (name.equalsIgnoreCase("frequent")) {
@@ -103,6 +113,8 @@ public class Randomizer {
 		} else if (name.equalsIgnoreCase("exit")) {
 			System.exit(1);
 			return false;
+		} else if (name.equals("")) {
+			return true;
 		} else {
 			out(sc, "invalid command");
 			return false;
@@ -126,12 +138,21 @@ public class Randomizer {
 		labels.add(pivot.prettyPrint());
 		List<Double> values = new ArrayList<Double>();
 		values.add(pivot.getFrequency());
+		double sum = pivot.getFrequency();
 		for (Sequence s : permutations) {
 			Result res = Sequence.search(sequences, s);
 			labels.add(s.prettyPrint());
 			values.add(res.getFrequency());
+			sum += res.getFrequency();
 		}
 		Plot p = new BoxPlot(sc, 100);
+
+		double distance = 0.0;
+		for (double d : values) {
+			distance += Math.pow((pivot.getFrequency() / sum - d / sum), 2);
+		}
+		distance /= (values.size() - 1);
+		sc.println("Mean distance from pivot: " + Math.sqrt(distance));
 		p.plot(labels, values);
 		return true;
 	}
@@ -273,7 +294,7 @@ public class Randomizer {
 		return true;
 	}
 
-	private static boolean ls(Processor sc, String[] args) {
+	private static boolean list(Processor sc, String[] args) {
 		if (sequences == null) {
 			out(sc, "'ls' expects a file to be loaded");
 			return false;
